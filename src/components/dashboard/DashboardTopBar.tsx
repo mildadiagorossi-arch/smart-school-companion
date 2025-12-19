@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Search, User, ChevronDown, LogOut, Settings, Moon, Sun } from "lucide-react";
+import { Bell, Search, User, ChevronDown, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,9 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import NetworkStatus from "./NetworkStatus";
+import RoleSwitcher from "./RoleSwitcher";
 
 const DashboardTopBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { user, logout } = useAuth();
 
   return (
     <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-40">
@@ -22,11 +26,18 @@ const DashboardTopBar = () => {
       <div className="flex items-center gap-4">
         <div className="hidden md:block">
           <h2 className="text-sm text-muted-foreground">Bienvenue,</h2>
-          <p className="font-semibold text-foreground">Directeur Mohamed</p>
+          <p className="font-semibold text-foreground">
+            {user?.firstName} {user?.lastName}
+          </p>
         </div>
         <Badge variant="outline" className="hidden sm:flex">
           📅 Année 2024-2025
         </Badge>
+
+        <div className="hidden lg:flex items-center gap-4 ml-2 border-l pl-4">
+          <RoleSwitcher />
+          <NetworkStatus />
+        </div>
       </div>
 
       {/* Search */}
@@ -44,6 +55,11 @@ const DashboardTopBar = () => {
 
       {/* Right Section */}
       <div className="flex items-center gap-2">
+        {/* Mobile Status */}
+        <div className="lg:hidden flex items-center gap-1 mr-2">
+          <NetworkStatus />
+        </div>
+
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -96,9 +112,9 @@ const DashboardTopBar = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 px-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="" />
+                <AvatarImage src={user?.avatar || ""} />
                 <AvatarFallback className="bg-primary text-primary-foreground">
-                  DM
+                  {user?.firstName?.[0]}{user?.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
               <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />
@@ -107,9 +123,9 @@ const DashboardTopBar = () => {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col">
-                <span>Directeur Mohamed</span>
+                <span>{user?.firstName} {user?.lastName}</span>
                 <span className="text-xs text-muted-foreground font-normal">
-                  direction@ecole.ma
+                  {user?.email}
                 </span>
               </div>
             </DropdownMenuLabel>
@@ -123,7 +139,7 @@ const DashboardTopBar = () => {
               Paramètres
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onClick={() => logout()}>
               <LogOut className="mr-2 h-4 w-4" />
               Déconnexion
             </DropdownMenuItem>

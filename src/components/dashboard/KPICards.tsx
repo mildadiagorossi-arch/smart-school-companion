@@ -1,17 +1,24 @@
 import { Users, UserCheck, TrendingUp, AlertTriangle, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import {
+  useStudentCount,
+  useAttendanceRate,
+  useAverageGrade,
+  useUnhandledAlertCount
+} from "@/hooks/useOfflineData";
 
 interface KPICardProps {
   title: string;
-  value: string;
+  value: string | number;
   subtext: string;
   icon: React.ElementType;
   trend?: { value: string; positive: boolean };
   color: "primary" | "success" | "warning" | "destructive";
+  loading?: boolean;
 }
 
-const KPICard = ({ title, value, subtext, icon: Icon, trend, color }: KPICardProps) => {
+const KPICard = ({ title, value, subtext, icon: Icon, trend, color, loading }: KPICardProps) => {
   const colorClasses = {
     primary: "from-primary/20 to-primary/5 border-primary/20",
     success: "from-green-500/20 to-green-500/5 border-green-500/20",
@@ -32,8 +39,11 @@ const KPICard = ({ title, value, subtext, icon: Icon, trend, color }: KPICardPro
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground font-medium">{title}</p>
-            <p className="text-3xl font-bold text-foreground group-hover:scale-105 transition-transform">
-              {value}
+            <p className={cn(
+              "text-3xl font-bold text-foreground group-hover:scale-105 transition-transform",
+              loading && "animate-pulse opacity-50"
+            )}>
+              {loading ? '...' : value}
             </p>
             <p className="text-xs text-muted-foreground">{subtext}</p>
           </div>
@@ -54,37 +64,46 @@ const KPICard = ({ title, value, subtext, icon: Icon, trend, color }: KPICardPro
 };
 
 const KPICards = () => {
+  const studentCount = useStudentCount();
+  const attendanceRate = useAttendanceRate();
+  const averageGrade = useAverageGrade();
+  const alertCount = useUnhandledAlertCount();
+
   const kpis: KPICardProps[] = [
     {
       title: "Total Élèves",
-      value: "1,248",
-      subtext: "32 classes actives",
+      value: studentCount ?? "1,248",
+      subtext: "Classes actives",
       icon: Users,
       trend: { value: "+12", positive: true },
       color: "primary",
+      loading: studentCount === undefined,
     },
     {
       title: "Taux de Présence",
-      value: "92%",
+      value: attendanceRate !== undefined ? `${attendanceRate}%` : "92%",
       subtext: "Aujourd'hui",
       icon: UserCheck,
       trend: { value: "+2.3%", positive: true },
       color: "success",
+      loading: attendanceRate === undefined,
     },
     {
       title: "Moyenne Générale",
-      value: "13.4/20",
+      value: averageGrade !== undefined && averageGrade > 0 ? `${averageGrade}/20` : "13.4/20",
       subtext: "Trimestre en cours",
       icon: TrendingUp,
       trend: { value: "+0.8", positive: true },
       color: "warning",
+      loading: averageGrade === undefined,
     },
     {
       title: "Alertes IA",
-      value: "7",
-      subtext: "À traiter",
+      value: alertCount ?? "7",
+      subtext: "À traiter localement",
       icon: AlertTriangle,
       color: "destructive",
+      loading: alertCount === undefined,
     },
   ];
 

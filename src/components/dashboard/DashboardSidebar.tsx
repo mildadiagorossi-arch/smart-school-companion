@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Users,
@@ -9,6 +10,7 @@ import {
   FileText,
   Clock,
   MessageSquare,
+  CreditCard,
   FolderOpen,
   Bot,
   Settings,
@@ -21,22 +23,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard", badge: null },
-  { icon: Users, label: "Élèves", href: "/dashboard/students", badge: null },
-  { icon: GraduationCap, label: "Enseignants", href: "/dashboard/teachers", badge: null },
-  { icon: School, label: "Classes & Matières", href: "/dashboard/classes", badge: null },
-  { icon: Calendar, label: "Emploi du Temps", href: "/dashboard/timetable", badge: null },
-  { icon: FileText, label: "Examens & Notes", href: "/dashboard/exams", badge: null },
-  { icon: Clock, label: "Présence", href: "/dashboard/attendance", badge: "3" },
-  { icon: MessageSquare, label: "Communication", href: "/dashboard/messages", badge: "5" },
-  { icon: FolderOpen, label: "Documents", href: "/dashboard/documents", badge: null },
-  { icon: Bot, label: "Assistant IA", href: "/dashboard/ai-assistant", badge: "✨" },
-  { icon: Settings, label: "Administration", href: "/dashboard/settings", badge: null },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard", badge: null, roles: ['direction', 'admin', 'teacher', 'parent'] },
+  { icon: Users, label: "Élèves", href: "/dashboard/students", badge: null, roles: ['direction', 'admin', 'teacher'] },
+  { icon: GraduationCap, label: "Enseignants", href: "/dashboard/teachers", badge: null, roles: ['direction', 'admin'] },
+  { icon: School, label: "Classes & Matières", href: "/dashboard/classes", badge: null, roles: ['direction', 'admin', 'teacher'] },
+  { icon: Calendar, label: "Emploi du Temps", href: "/dashboard/timetable", badge: null, roles: ['direction', 'admin', 'teacher', 'parent'] },
+  { icon: FileText, label: "Examens & Notes", href: "/dashboard/exams", badge: null, roles: ['direction', 'admin', 'teacher', 'parent'] },
+  { icon: Clock, label: "Présence", href: "/dashboard/attendance", badge: "3", roles: ['direction', 'admin', 'teacher', 'parent'] },
+  { icon: MessageSquare, label: "Communication", href: "/dashboard/communication", badge: "5", roles: ['direction', 'admin', 'teacher', 'parent'] },
+  { icon: CreditCard, label: "Facturation", href: "/dashboard/finance", badge: null, roles: ['direction', 'admin'] },
+  { icon: FolderOpen, label: "Documents", href: "/dashboard/documents", badge: null, roles: ['direction', 'admin', 'teacher', 'parent'] },
+  { icon: Bot, label: "Assistant IA", href: "/dashboard/ai-assistant", badge: "✨", roles: ['direction', 'admin', 'teacher'] },
+  { icon: Settings, label: "Configuration", href: "/dashboard/settings", badge: null, roles: ['direction', 'admin'] },
 ];
 
 const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
+
+  const filteredMenuItems = menuItems.filter(item =>
+    !user || item.roles.includes(user.role)
+  );
 
   return (
     <aside
@@ -69,10 +77,10 @@ const DashboardSidebar = () => {
       {/* Navigation */}
       <nav className="flex-1 py-4 overflow-y-auto">
         <ul className="space-y-1 px-2">
-          {menuItems.map((item) => {
-            const isActive = location.pathname === item.href || 
+          {filteredMenuItems.map((item) => {
+            const isActive = location.pathname === item.href ||
               (item.href !== "/dashboard" && location.pathname.startsWith(item.href));
-            
+
             return (
               <li key={item.href}>
                 <NavLink
