@@ -41,9 +41,11 @@ const Navbar = () => {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
             <Button variant="ghost">Connexion</Button>
-            <Button variant="hero" size="lg">
-              Démo gratuite 🚀
-            </Button>
+            <a href="/dashboard">
+              <Button variant="hero" size="lg">
+                Démo gratuite 🚀
+              </Button>
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -76,7 +78,9 @@ const Navbar = () => {
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
                 <Button variant="ghost" className="w-full">Connexion</Button>
-                <Button variant="hero" className="w-full">Démo gratuite 🚀</Button>
+                <a href="/dashboard" className="w-full">
+                  <Button variant="hero" className="w-full">Démo gratuite 🚀</Button>
+                </a>
               </div>
             </div>
           </div>
