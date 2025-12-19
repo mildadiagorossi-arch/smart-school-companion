@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSchoolProfile } from "@/hooks/useOfflineData";
 import {
   LayoutDashboard,
   Users,
@@ -41,6 +42,7 @@ const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
+  const schoolProfile = useSchoolProfile();
 
   const filteredMenuItems = menuItems.filter(item =>
     !user || item.roles.includes(user.role)
@@ -56,12 +58,20 @@ const DashboardSidebar = () => {
       {/* Logo */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-border">
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <GraduationCap className="h-8 w-8 text-primary" />
-              <Sparkles className="h-4 w-4 text-accent absolute -top-1 -right-1" />
+          <div className="flex items-center gap-2 overflow-hidden">
+            <div className="relative flex-shrink-0">
+              {schoolProfile?.logo ? (
+                <img src={schoolProfile.logo} alt="Logo" className="h-8 w-8 object-contain" />
+              ) : (
+                <>
+                  <GraduationCap className="h-8 w-8 text-primary" />
+                  <Sparkles className="h-4 w-4 text-accent absolute -top-1 -right-1" />
+                </>
+              )}
             </div>
-            <span className="font-bold text-lg text-gradient">SchoolGenius</span>
+            <span className="font-bold text-lg text-gradient truncate">
+              {schoolProfile?.name || "SchoolGenius"}
+            </span>
           </div>
         )}
         <Button

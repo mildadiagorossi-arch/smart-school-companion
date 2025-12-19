@@ -1,6 +1,6 @@
 /**
  * SchoolGenius - Sync Engine
- * Gestion de la synchronisation offline/online
+ * Gestion de la synchronisation offline/online avec support Multi-Tenancy
  */
 
 import { db, SyncAction, generateLocalId, getCurrentTimestamp } from './db';
@@ -9,7 +9,7 @@ import { db, SyncAction, generateLocalId, getCurrentTimestamp } from './db';
 // TYPES
 // ============================================
 
-type EntityType = 'student' | 'teacher' | 'class' | 'attendance' | 'grade' | 'message';
+type EntityType = 'student' | 'teacher' | 'class' | 'attendance' | 'grade' | 'message' | 'exam' | 'invoice' | 'document';
 type ActionType = 'CREATE' | 'UPDATE' | 'DELETE';
 
 interface SyncResult {
@@ -39,10 +39,12 @@ class SyncEngine {
         type: ActionType,
         entity: EntityType,
         entityId: string,
-        payload: Record<string, unknown>
+        payload: any,
+        schoolId: string
     ): Promise<void> {
         const action: SyncAction = {
             actionId: generateLocalId(),
+            schoolId, // Separation au niveau de la sync
             type,
             entity,
             entityId,
@@ -53,7 +55,7 @@ class SyncEngine {
         };
 
         await db.syncActions.add(action);
-        console.log(`[SyncEngine] Action queued: ${type} ${entity} ${entityId}`);
+        console.log(`[SyncEngine] Action queued [${schoolId}]: ${type} ${entity} ${entityId}`);
 
         // Tenter une sync immédiate si online
         if (navigator.onLine) {
@@ -72,13 +74,6 @@ class SyncEngine {
             .toArray();
     }
 
-    /**
-     * Compte les actions en attente
-     */
-    async getPendingCount(): Promise<number> {
-        return db.syncActions.where('status').equals('pending').count();
-    }
-
     // ==========================================
     // SYNCHRONIZATION
     // ==========================================
@@ -88,12 +83,10 @@ class SyncEngine {
      */
     async syncNow(): Promise<SyncResult> {
         if (this.isSyncing) {
-            console.log('[SyncEngine] Sync already in progress');
             return { success: false, syncedCount: 0, failedCount: 0, errors: ['Sync in progress'] };
         }
 
         if (!navigator.onLine) {
-            console.log('[SyncEngine] Offline - sync skipped');
             return { success: false, syncedCount: 0, failedCount: 0, errors: ['Offline'] };
         }
 
@@ -102,7 +95,6 @@ class SyncEngine {
 
         try {
             const pendingActions = await this.getPendingActions();
-            console.log(`[SyncEngine] Starting sync with ${pendingActions.length} pending actions`);
 
             for (const action of pendingActions) {
                 try {
@@ -114,14 +106,10 @@ class SyncEngine {
                 }
             }
 
-            // Télécharger les nouvelles données du serveur
-            await this.pullFromServer();
-
             console.log(`[SyncEngine] Sync complete: ${result.syncedCount} synced, ${result.failedCount} failed`);
         } catch (error) {
             result.success = false;
             result.errors.push(`Sync error: ${error}`);
-            console.error('[SyncEngine] Sync failed:', error);
         } finally {
             this.isSyncing = false;
         }
@@ -133,7 +121,6 @@ class SyncEngine {
      * Traite une action de synchronisation
      */
     private async processSyncAction(action: SyncAction): Promise<void> {
-        // Marquer comme en cours
         await db.syncActions.update(action.id!, { status: 'syncing' });
 
         try {
@@ -142,11 +129,17 @@ class SyncEngine {
 
             let response: Response;
 
+            // Inclure schoolId dans les headers pour le backend
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-School-Id': action.schoolId
+            };
+
             switch (action.type) {
                 case 'CREATE':
                     response = await fetch(`${this.apiBaseUrl}${endpoint}`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers,
                         body: JSON.stringify(payload),
                     });
                     break;
@@ -154,7 +147,7 @@ class SyncEngine {
                 case 'UPDATE':
                     response = await fetch(`${this.apiBaseUrl}${endpoint}/${action.entityId}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers,
                         body: JSON.stringify(payload),
                     });
                     break;
@@ -162,6 +155,7 @@ class SyncEngine {
                 case 'DELETE':
                     response = await fetch(`${this.apiBaseUrl}${endpoint}/${action.entityId}`, {
                         method: 'DELETE',
+                        headers,
                     });
                     break;
 
@@ -173,39 +167,22 @@ class SyncEngine {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
-            // Marquer comme synchronisé
             await db.syncActions.update(action.id!, {
                 status: 'synced',
                 syncedAt: getCurrentTimestamp(),
             });
 
-            // Mettre à jour le syncStatus de l'entité
             await this.updateEntitySyncStatus(action.entity, action.entityId, 'synced');
 
         } catch (error) {
-            // Incrémenter le compteur de tentatives
             await db.syncActions.update(action.id!, {
                 status: 'error',
                 retryCount: action.retryCount + 1,
                 errorMessage: String(error),
             });
-
             throw error;
         }
     }
-
-    /**
-     * Télécharge les données du serveur
-     */
-    private async pullFromServer(): Promise<void> {
-        // TODO: Implémenter le pull des données serveur
-        // Cela dépend de l'API backend
-        console.log('[SyncEngine] Pull from server - Not yet implemented');
-    }
-
-    // ==========================================
-    // HELPERS
-    // ==========================================
 
     private getEndpoint(entity: EntityType): string {
         const endpoints: Record<EntityType, string> = {
@@ -215,6 +192,9 @@ class SyncEngine {
             attendance: '/attendance',
             grade: '/grades',
             message: '/messages',
+            exam: '/exams',
+            invoice: '/invoices',
+            document: '/documents'
         };
         return endpoints[entity];
     }
@@ -224,13 +204,16 @@ class SyncEngine {
         localId: string,
         status: 'pending' | 'synced' | 'error'
     ): Promise<void> {
-        const tableMap = {
+        const tableMap: any = {
             student: db.students,
             teacher: db.teachers,
             class: db.classes,
             attendance: db.attendance,
             grade: db.grades,
             message: db.messages,
+            exam: db.exams,
+            invoice: db.invoices,
+            document: db.documents
         };
 
         const table = tableMap[entity];
@@ -242,53 +225,13 @@ class SyncEngine {
         }
     }
 
-    // ==========================================
-    // CONFLICT RESOLUTION
-    // ==========================================
-
-    /**
-     * Résolution de conflits "Last Write Wins" pour présence et notes
-     */
-    async resolveConflict(
-        entity: EntityType,
-        localData: Record<string, unknown>,
-        serverData: Record<string, unknown>
-    ): Promise<Record<string, unknown>> {
-        // Pour présence et notes: Last Write Wins
-        if (entity === 'attendance' || entity === 'grade') {
-            const localUpdated = new Date(localData.updatedAt as string).getTime();
-            const serverUpdated = new Date(serverData.updatedAt as string).getTime();
-
-            return localUpdated > serverUpdated ? localData : serverData;
-        }
-
-        // Pour les autres entités: priorité serveur (validation admin requise)
-        return serverData;
-    }
-
-    // ==========================================
-    // EVENT LISTENERS
-    // ==========================================
-
-    /**
-     * Initialise les listeners réseau
-     */
     initNetworkListeners(): void {
-        window.addEventListener('online', () => {
-            console.log('[SyncEngine] Back online - starting sync');
-            this.syncNow();
-        });
-
-        window.addEventListener('offline', () => {
-            console.log('[SyncEngine] Gone offline - actions will be queued');
-        });
+        window.addEventListener('online', () => this.syncNow());
     }
 }
 
-// Instance singleton
 export const syncEngine = new SyncEngine();
 
-// Initialiser les listeners au chargement
 if (typeof window !== 'undefined') {
     syncEngine.initNetworkListeners();
 }

@@ -15,21 +15,36 @@ import {
     ImageIcon,
     Upload,
     RotateCcw,
-    Languages
+    Languages,
+    Phone,
+    Mail
 } from "lucide-react";
 import { toast } from "sonner";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { cn } from "@/lib/utils";
+import { useSchoolProfile, updateSchoolProfile } from "@/hooks/useOfflineData";
 
 const Settings = () => {
     const { user } = useAuth();
+    const schoolProfile = useSchoolProfile();
 
     // School Info State
-    const [schoolName, setSchoolName] = useState("École Excellence");
-    const [schoolAddress, setSchoolAddress] = useState("123 Rue de l'Éducation, Casablanca");
+    const [schoolName, setSchoolName] = useState("");
+    const [schoolAddress, setSchoolAddress] = useState("");
+    const [schoolPhone, setSchoolPhone] = useState("");
+    const [schoolEmail, setSchoolEmail] = useState("");
     const [schoolLogo, setSchoolLogo] = useState<string | null>(null);
     const logoInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (schoolProfile) {
+            setSchoolName(schoolProfile.name);
+            setSchoolAddress(schoolProfile.address || "");
+            setSchoolPhone(schoolProfile.phone || "");
+            setSchoolEmail(schoolProfile.email || "");
+            setSchoolLogo(schoolProfile.logo || null);
+        }
+    }, [schoolProfile]);
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -39,6 +54,24 @@ const Settings = () => {
                 setSchoolLogo(reader.result as string);
             };
             reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSaveSchool = async () => {
+        if (!user?.schoolId) return;
+
+        try {
+            await updateSchoolProfile(user.schoolId, {
+                name: schoolName,
+                address: schoolAddress,
+                phone: schoolPhone,
+                email: schoolEmail,
+                logo: schoolLogo || undefined
+            });
+            toast.success("Informations de l'établissement mises à jour !");
+        } catch (error) {
+            toast.error("Erreur lors de la mise à jour.");
+            console.error(error);
         }
     };
 
@@ -133,14 +166,42 @@ const Settings = () => {
                                         <Label htmlFor="schoolName">Nom de l'école</Label>
                                         <Input
                                             id="schoolName"
+                                            placeholder="Ex: École Al-Farabi"
                                             value={schoolName}
                                             onChange={(e) => setSchoolName(e.target.value)}
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <Label htmlFor="schoolEmail">Email de contact</Label>
+                                        <div className="relative">
+                                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                            <Input
+                                                id="schoolEmail"
+                                                className="pl-10"
+                                                placeholder="contact@ecole.ma"
+                                                value={schoolEmail}
+                                                onChange={(e) => setSchoolEmail(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="schoolPhone">Téléphone</Label>
+                                        <div className="relative">
+                                            <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                            <Input
+                                                id="schoolPhone"
+                                                className="pl-10"
+                                                placeholder="+212 5..."
+                                                value={schoolPhone}
+                                                onChange={(e) => setSchoolPhone(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="schoolAddress">Adresse physique</Label>
                                         <Input
                                             id="schoolAddress"
+                                            placeholder="Adresse complète"
                                             value={schoolAddress}
                                             onChange={(e) => setSchoolAddress(e.target.value)}
                                         />
@@ -149,15 +210,15 @@ const Settings = () => {
 
                                 <div className="space-y-3">
                                     <Label>Logo de l'établissement</Label>
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-24 w-24 rounded-xl border-2 border-dashed flex items-center justify-center bg-muted/30 overflow-hidden group hover:border-primary/50 transition-colors">
+                                    <div className="flex flex-col items-center gap-4 p-4 border rounded-xl bg-muted/10">
+                                        <div className="h-32 w-32 rounded-xl border-2 border-dashed flex items-center justify-center bg-background overflow-hidden group hover:border-primary/50 transition-colors shadow-inner">
                                             {schoolLogo ? (
-                                                <img src={schoolLogo} alt="Logo" className="h-full w-full object-cover" />
+                                                <img src={schoolLogo} alt="Logo" className="h-full w-full object-contain p-2" />
                                             ) : (
-                                                <ImageIcon className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                                                <ImageIcon className="h-10 w-10 text-muted-foreground group-hover:text-primary transition-colors" />
                                             )}
                                         </div>
-                                        <div className="flex-1 space-y-2">
+                                        <div className="w-full space-y-2">
                                             <input
                                                 type="file"
                                                 ref={logoInputRef}
@@ -172,17 +233,17 @@ const Settings = () => {
                                                 onClick={() => logoInputRef.current?.click()}
                                             >
                                                 <Upload className="h-4 w-4" />
-                                                Choisir un fichier
+                                                Changer le logo
                                             </Button>
-                                            <p className="text-[10px] text-muted-foreground text-center">PNG, JPG jusqu'à 2Mo</p>
+                                            <p className="text-[10px] text-muted-foreground text-center line-clamp-1">Format PNG, JPG ou SVG (Max 2Mo)</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <Separator />
-                            <Button onClick={() => handleSave("établissement")} className="w-full shadow-lg shadow-primary/10">
-                                Mettre à jour l'établissement
+                            <Button onClick={handleSaveSchool} className="w-full shadow-lg shadow-primary/10">
+                                Enregistrer les informations de l'établissement
                             </Button>
                         </div>
                     </Card>

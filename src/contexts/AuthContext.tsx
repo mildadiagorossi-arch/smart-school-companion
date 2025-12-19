@@ -15,6 +15,7 @@ export type UserRole = 'direction' | 'admin' | 'teacher' | 'parent';
 export interface User {
     id: string;
     email: string;
+    schoolId: string; // Identifiant de l'établissement
     firstName: string;
     lastName: string;
     role: UserRole;
@@ -105,6 +106,7 @@ const MOCK_USERS: Record<string, User> = {
     'direction@ecole.ma': {
         id: 'usr_direction_001',
         email: 'direction@ecole.ma',
+        schoolId: 'school_001',
         firstName: 'Mohamed',
         lastName: 'Directeur',
         role: 'direction',
@@ -113,6 +115,7 @@ const MOCK_USERS: Record<string, User> = {
     'admin@ecole.ma': {
         id: 'usr_admin_001',
         email: 'admin@ecole.ma',
+        schoolId: 'school_001',
         firstName: 'Fatima',
         lastName: 'Benali',
         role: 'admin',
@@ -121,6 +124,7 @@ const MOCK_USERS: Record<string, User> = {
     'prof@ecole.ma': {
         id: 'usr_teacher_001',
         email: 'prof@ecole.ma',
+        schoolId: 'school_001',
         firstName: 'Ahmed',
         lastName: 'Professeur',
         role: 'teacher',
@@ -130,6 +134,7 @@ const MOCK_USERS: Record<string, User> = {
     'parent@ecole.ma': {
         id: 'usr_parent_001',
         email: 'parent@ecole.ma',
+        schoolId: 'school_001',
         firstName: 'Khadija',
         lastName: 'Mère',
         role: 'parent',
