@@ -54,6 +54,7 @@ const TeachersPage = () => {
         try {
             await addTeacher({
                 ...newTeacher,
+                schoolId: 'demo_school',
                 hireDate: new Date().toISOString(),
             });
             toast.success("Enseignant ajouté avec succès");

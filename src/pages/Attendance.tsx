@@ -23,14 +23,15 @@ const AttendancePage = () => {
     const classes = useClasses();
     const attendance = useAttendanceToday(selectedClass === "all" ? undefined : selectedClass);
 
-    const handleMark = async (studentId: string, status: 'present' | 'absent' | 'late') => {
+    const handleMark = async (studentId: string, classId: string, status: 'present' | 'absent' | 'late') => {
         try {
-            await markAttendance({
+            await markAttendance(
+                'demo_school',
                 studentId,
-                date: new Date().toISOString().split('T')[0],
+                classId,
                 status,
-                session: "Matin" // Mock
-            });
+                'current_user'
+            );
             toast.success("Statut mis à jour");
         } catch (error) {
             toast.error("Erreur de mise à jour");
@@ -38,7 +39,7 @@ const AttendancePage = () => {
     };
 
     const filteredAttendance = attendance?.filter(a =>
-        (a.studentName || "").toLowerCase().includes(searchTerm.toLowerCase())
+        a.studentId.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -92,7 +93,7 @@ const AttendancePage = () => {
                         <Card key={record.studentId} className="p-4 flex flex-col gap-4 hover:shadow-md transition-shadow">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="font-semibold">{record.studentName || "Élève Inconnu"}</h3>
+                                    <h3 className="font-semibold">Élève {record.studentId.slice(-6)}</h3>
                                     <p className="text-xs text-muted-foreground">Classe: {record.classId}</p>
                                 </div>
                                 <Badge variant={
@@ -114,7 +115,7 @@ const AttendancePage = () => {
                                     size="sm"
                                     variant={record.status === 'present' ? 'default' : 'outline'}
                                     className={cn("gap-1", record.status === 'present' && "bg-green-500 hover:bg-green-600 border-green-500")}
-                                    onClick={() => handleMark(record.studentId, 'present')}
+                                    onClick={() => handleMark(record.studentId, record.classId, 'present')}
                                 >
                                     <CheckCircle2 className="h-3 w-3" />
                                     P
@@ -123,7 +124,7 @@ const AttendancePage = () => {
                                     size="sm"
                                     variant={record.status === 'late' ? 'default' : 'outline'}
                                     className={cn("gap-1", record.status === 'late' && "bg-yellow-500 hover:bg-yellow-600 border-yellow-500")}
-                                    onClick={() => handleMark(record.studentId, 'late')}
+                                    onClick={() => handleMark(record.studentId, record.classId, 'late')}
                                 >
                                     <Clock className="h-3 w-3" />
                                     R
@@ -132,7 +133,7 @@ const AttendancePage = () => {
                                     size="sm"
                                     variant={record.status === 'absent' ? 'default' : 'outline'}
                                     className={cn("gap-1", record.status === 'absent' && "bg-destructive hover:bg-destructive/90 border-destructive")}
-                                    onClick={() => handleMark(record.studentId, 'absent')}
+                                    onClick={() => handleMark(record.studentId, record.classId, 'absent')}
                                 >
                                     <XCircle className="h-3 w-3" />
                                     A

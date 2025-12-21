@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useClasses, useExams, useGrades } from "@/hooks/useOfflineData";
+import { useClasses, useExams } from "@/hooks/useOfflineData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

@@ -38,7 +38,7 @@ const ClassesPage = () => {
     const handleAddClass = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await addClass(newClass);
+            await addClass({ ...newClass, schoolId: 'demo_school' });
             toast.success("Classe créée avec succès");
             setIsAddClassOpen(false);
             setNewClass({ name: "", level: "", academicYear: "2024-2025", capacity: 30 });

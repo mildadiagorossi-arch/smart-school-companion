@@ -62,7 +62,8 @@ const StudentsPage = () => {
         try {
             await addStudent({
                 ...newStudent,
-                dateOfBirth: new Date().toISOString(), // Mock
+                schoolId: 'demo_school',
+                dateOfBirth: new Date().toISOString(),
                 enrollmentDate: new Date().toISOString(),
             });
             toast.success("Élève ajouté avec succès (sync en attente)");
