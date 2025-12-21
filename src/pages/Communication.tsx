@@ -45,8 +45,9 @@ const CommunicationPage = () => {
         try {
             await sendMessage({
                 ...newMessage,
+                schoolId: 'demo_school',
                 senderId: user?.id?.toString() || "me",
-                senderRole: user?.role || 'direction',
+                senderRole: (user?.role === 'admin' ? 'direction' : user?.role === 'teacher' ? 'teacher' : 'parent') as 'direction' | 'teacher' | 'parent',
                 readBy: []
             });
             toast.success("Message envoyé (synchronisation en attente)");
