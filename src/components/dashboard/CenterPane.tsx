@@ -32,13 +32,13 @@ const CenterPane = ({
   };
 
   return (
-    <div className={cn("w-80 border-r border-border flex flex-col h-full bg-card/50", className)}>
+    <div className={cn("w-80 shadow-lg border-0 flex flex-col h-full bg-card rounded-2xl mx-2 my-2", className)}>
       {/* Header */}
-      <div className="p-4 border-b border-border space-y-3">
+      <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-lg">{title}</h2>
           {onAdd && (
-            <Button size="sm" onClick={onAdd} className="h-8">
+            <Button size="sm" onClick={onAdd} className="h-9 rounded-xl shadow-sm hover:shadow-md transition-all">
               <Plus className="h-4 w-4 mr-1" />
               {addLabel}
             </Button>
@@ -51,12 +51,12 @@ const CenterPane = ({
             placeholder={searchPlaceholder}
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pl-9 pr-9 h-9 text-sm"
+            className="pl-9 pr-9 h-10 text-sm rounded-xl bg-muted/30 border-0 shadow-sm focus:shadow-md transition-all"
           />
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg"
           >
             <Filter className="h-3.5 w-3.5 text-muted-foreground" />
           </Button>
@@ -64,8 +64,8 @@ const CenterPane = ({
       </div>
 
       {/* List */}
-      <ScrollArea className="flex-1">
-        <div className="divide-y divide-border">
+      <ScrollArea className="flex-1 px-2 pb-2">
+        <div className="space-y-2">
           {children}
         </div>
       </ScrollArea>

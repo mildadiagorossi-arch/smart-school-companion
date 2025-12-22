@@ -34,9 +34,9 @@ const DetailPane = ({
   const [isMaximized, setIsMaximized] = React.useState(false);
 
   return (
-    <div className={cn("flex-1 flex flex-col h-full bg-background min-w-0", className)}>
+    <div className={cn("flex-1 flex flex-col h-full bg-card min-w-0 rounded-2xl shadow-lg border-0 m-2", className)}>
       {/* Header */}
-      <div className="h-14 px-6 flex items-center justify-between border-b border-border shrink-0">
+      <div className="h-16 px-6 flex items-center justify-between shrink-0">
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold text-lg truncate">{title}</h2>
           {subtitle && (
@@ -44,12 +44,12 @@ const DetailPane = ({
           )}
         </div>
         
-        <div className="flex items-center gap-1 ml-4">
+        <div className="flex items-center gap-2 ml-4">
           {actions}
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-9 w-9 rounded-xl hover:bg-muted/50 hover:shadow-sm"
             onClick={() => setIsMaximized(!isMaximized)}
           >
             {isMaximized ? (
@@ -62,7 +62,7 @@ const DetailPane = ({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-9 w-9 rounded-xl hover:bg-muted/50 hover:shadow-sm"
               onClick={onClose}
             >
               <X className="h-4 w-4" />
@@ -74,13 +74,13 @@ const DetailPane = ({
       {/* Content */}
       {tabs ? (
         <Tabs defaultValue={tabs[0]?.id} className="flex-1 flex flex-col min-h-0">
-          <div className="border-b border-border px-6">
-            <TabsList className="h-10 bg-transparent p-0 w-full justify-start">
+          <div className="px-6">
+            <TabsList className="h-11 bg-muted/30 p-1 rounded-xl w-full justify-start shadow-sm">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 h-10"
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg px-4 h-9 transition-all"
                 >
                   {tab.icon && <tab.icon className="h-4 w-4 mr-2" />}
                   {tab.label}

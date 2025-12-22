@@ -35,23 +35,25 @@ const CopilotPanel = () => {
   return (
     <div
       className={cn(
-        "h-full bg-card border-l border-border flex flex-col transition-all duration-300 overflow-hidden",
-        isCopilotOpen ? "w-80" : "w-0"
+        "h-full bg-card flex flex-col transition-all duration-300 overflow-hidden rounded-l-2xl shadow-lg border-0",
+        isCopilotOpen ? "w-80 m-2 ml-0" : "w-0 m-0"
       )}
     >
       {isCopilotOpen && (
         <>
           {/* Header */}
-          <div className="h-12 px-4 flex items-center justify-between border-b border-border bg-gradient-to-r from-primary/10 to-accent/10">
+          <div className="h-14 px-4 flex items-center justify-between bg-gradient-to-r from-primary/15 to-accent/15 rounded-tl-2xl">
             <div className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-primary" />
+              <div className="p-1.5 rounded-lg bg-primary/20">
+                <Bot className="h-5 w-5 text-primary" />
+              </div>
               <span className="font-semibold text-sm">Copilot IA</span>
               <Sparkles className="h-3 w-3 text-accent" />
             </div>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7"
+              className="h-8 w-8 rounded-lg hover:bg-background/50"
               onClick={() => setIsCopilotOpen(false)}
             >
               <X className="h-4 w-4" />
@@ -60,7 +62,7 @@ const CopilotPanel = () => {
 
           {/* Context Banner */}
           {selectedItem && (
-            <div className="px-4 py-2 bg-muted/50 border-b border-border">
+            <div className="px-4 py-2 bg-muted/30">
               <p className="text-xs text-muted-foreground">Contexte actif :</p>
               <p className="text-sm font-medium truncate">
                 {selectedItem.name || selectedItem.firstName + " " + selectedItem.lastName}
@@ -79,7 +81,7 @@ const CopilotPanel = () => {
                   {quickActions.map((action) => (
                     <button
                       key={action.action}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted text-left transition-colors"
+                      className="w-full flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 text-left transition-all hover:shadow-sm"
                       onClick={() => {
                         setMessages([
                           { role: "user", content: action.label },
@@ -87,22 +89,24 @@ const CopilotPanel = () => {
                         ]);
                       }}
                     >
-                      <action.icon className="h-4 w-4 text-primary" />
+                      <div className="p-1.5 rounded-lg bg-primary/15">
+                        <action.icon className="h-4 w-4 text-primary" />
+                      </div>
                       <span className="text-sm">{action.label}</span>
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {messages.map((msg, i) => (
                   <div
                     key={i}
                     className={cn(
-                      "p-3 rounded-lg text-sm",
+                      "p-3 rounded-xl text-sm shadow-sm",
                       msg.role === "user"
                         ? "bg-primary text-primary-foreground ml-4"
-                        : "bg-muted mr-4"
+                        : "bg-muted/50 mr-4"
                     )}
                   >
                     {msg.content}
@@ -113,16 +117,16 @@ const CopilotPanel = () => {
           </ScrollArea>
 
           {/* Input */}
-          <div className="p-4 border-t border-border">
+          <div className="p-4">
             <div className="flex gap-2">
               <Input
                 placeholder="Demandez à l'IA..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                className="text-sm"
+                className="text-sm rounded-xl bg-muted/30 border-0 shadow-sm focus:shadow-md"
               />
-              <Button size="icon" onClick={handleSend}>
+              <Button size="icon" onClick={handleSend} className="rounded-xl shadow-sm hover:shadow-md">
                 <Send className="h-4 w-4" />
               </Button>
             </div>

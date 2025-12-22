@@ -34,22 +34,22 @@ const ListItem = ({
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 p-3 text-left transition-colors hover:bg-muted/50",
-        isSelected && "bg-primary/10 border-l-2 border-l-primary",
+        "w-full flex items-center gap-3 p-3 text-left transition-all rounded-xl hover:bg-muted/30 hover:shadow-sm",
+        isSelected && "bg-primary/10 shadow-sm ring-2 ring-primary/20",
         className
       )}
     >
       {(avatar || initials) && (
-        <Avatar className="h-9 w-9 shrink-0">
+        <Avatar className="h-10 w-10 shrink-0 shadow-sm">
           <AvatarImage src={avatar} />
-          <AvatarFallback className="bg-primary/10 text-primary text-xs">
+          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-primary text-xs font-medium">
             {initials}
           </AvatarFallback>
         </Avatar>
       )}
       
       {icon && (
-        <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+        <div className="h-10 w-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 shadow-sm">
           {icon}
         </div>
       )}
@@ -58,7 +58,7 @@ const ListItem = ({
         <div className="flex items-center gap-2">
           <span className="font-medium text-sm truncate">{title}</span>
           {badge && (
-            <Badge variant={badgeVariant} className="text-[10px] h-5 px-1.5">
+            <Badge variant={badgeVariant} className="text-[10px] h-5 px-1.5 rounded-full shadow-sm">
               {badge}
             </Badge>
           )}
