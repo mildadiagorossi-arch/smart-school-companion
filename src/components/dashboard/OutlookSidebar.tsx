@@ -50,18 +50,18 @@ const OutlookSidebar = () => {
 
   return (
     <TooltipProvider delayDuration={100}>
-      <aside className="w-14 bg-card border-r border-border flex flex-col h-full">
+      <aside className="w-16 bg-card shadow-lg border-0 flex flex-col h-full rounded-r-2xl">
         {/* Logo */}
-        <div className="h-14 flex items-center justify-center border-b border-border">
-          <div className="relative">
+        <div className="h-16 flex items-center justify-center">
+          <div className="relative p-2 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 shadow-sm">
             <GraduationCap className="h-7 w-7 text-primary" />
             <Sparkles className="h-3 w-3 text-accent absolute -top-1 -right-1" />
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-2 overflow-y-auto">
-          <ul className="space-y-1 px-1.5">
+        <nav className="flex-1 py-4 overflow-y-auto">
+          <ul className="space-y-2 px-2">
             {filteredMenuItems.map((item) => {
               const isActive = location.pathname === item.href ||
                 (item.href !== "/dashboard" && location.pathname.startsWith(item.href));
@@ -73,24 +73,24 @@ const OutlookSidebar = () => {
                       <NavLink
                         to={item.href}
                         className={cn(
-                          "relative flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-200 mx-auto",
+                          "relative flex items-center justify-center h-11 w-11 rounded-xl transition-all duration-200 mx-auto",
                           isActive
                             ? "bg-primary text-primary-foreground shadow-md"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm"
                         )}
                       >
                         <item.icon className="h-5 w-5" />
                         {item.badge && (
                           <Badge
                             variant={item.badge === "✨" ? "default" : "destructive"}
-                            className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center"
+                            className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center rounded-full"
                           >
                             {item.badge}
                           </Badge>
                         )}
                       </NavLink>
                     </TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium">
+                    <TooltipContent side="right" className="font-medium rounded-xl shadow-md">
                       {item.label}
                     </TooltipContent>
                   </Tooltip>
@@ -101,17 +101,17 @@ const OutlookSidebar = () => {
         </nav>
 
         {/* Copilot Button */}
-        <div className="p-2 border-t border-border">
+        <div className="p-3">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={() => setIsCopilotOpen(true)}
-                className="flex items-center justify-center h-10 w-10 rounded-lg mx-auto bg-gradient-to-br from-primary/20 to-accent/20 text-primary hover:from-primary/30 hover:to-accent/30 transition-all duration-200"
+                className="flex items-center justify-center h-11 w-11 rounded-xl mx-auto bg-gradient-to-br from-primary/30 to-accent/30 text-primary hover:from-primary/40 hover:to-accent/40 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Bot className="h-5 w-5" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="font-medium">
+            <TooltipContent side="right" className="font-medium rounded-xl shadow-md">
               Copilot IA
             </TooltipContent>
           </Tooltip>

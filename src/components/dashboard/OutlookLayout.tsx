@@ -60,7 +60,7 @@ const OutlookLayout = ({ children }: OutlookLayoutProps) => {
         setIsCommandPaletteOpen,
       }}
     >
-      <div className="flex flex-col h-screen bg-background overflow-hidden">
+      <div className="flex flex-col h-screen bg-background overflow-hidden p-1">
         <OutlookTopBar />
         
         <div className="flex flex-1 min-h-0">
