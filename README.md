@@ -1,73 +1,118 @@
-# Welcome to your Lovable project
+# Smart School Companion - Intégration Complète
 
-## Project info
+## 🎯 Objectif
+Application de gestion scolaire avec authentification, support PWA, internationalisation et gestion des étudiants, classes et présences.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## ✨ Fonctionnalités Implémentées
 
-## How can I edit this code?
+### 1. Système d'Authentification (Zustand)
+- **Connexion** : Mode démo activé (n'importe quel email/mot de passe fonctionne)
+- **Inscription** : Formulaire complet avec sélection de rôle
+- **Réinitialisation** : Workflow de récupération de mot de passe
+- **Protection** : Routes protégées avec middleware
 
-There are several ways of editing your application.
+### 2. Modules Principaux (Offline-First avec Dexie)
+- **Étudiants** : CRUD complet avec recherche
+- **Classes** : Gestion des classes et affectations
+- **Présences** : Marquage par classe avec sélection de date
 
-**Use Lovable**
+### 3. Progressive Web App (PWA)
+- Manifest pour installation
+- Service Worker pour cache offline
+- Indicateur de connexion
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### 4. Internationalisation (i18n)
+- Anglais et Français
+- Détection automatique de langue
+- Hook `useLanguage` pour changement dynamique
 
-Changes made via Lovable will be committed automatically to this repo.
+### 5. UI/UX
+- Design Tailwind CSS moderne
+- Composants réutilisables (Button, Input, Modal, Alert)
+- Layout avec Sidebar et Navbar
+- Responsive design
 
-**Use your preferred IDE**
+## 📁 Structure du Projet
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+├── components/
+│   ├── common/        # Button, Modal, Alert, OfflineIndicator
+│   ├── forms/         # Input, Select, Textarea
+│   └── layout/        # Sidebar, Navbar
+├── hooks/
+│   ├── useAuth.ts     # Authentification
+│   ├── useForm.ts     # Gestion de formulaires
+│   ├── useStudents.ts # Gestion étudiants
+│   ├── useClasses.ts  # Gestion classes
+│   └── useAttendance.ts # Gestion présences
+├── lib/
+│   ├── api.ts         # Client Axios avec intercepteurs
+│   ├── db.ts          # Configuration Dexie (IndexedDB)
+│   ├── validators.ts  # Schémas Zod
+│   └── pwaManager.ts  # Gestion PWA
+├── pages/
+│   ├── auth/          # Login, Register, ForgotPassword
+│   ├── students/      # StudentsPage, StudentForm, StudentDetail
+│   ├── classes/       # ClassesPage, ClassForm
+│   └── attendance/    # AttendancePage
+├── services/
+│   └── authService.ts # API calls authentification
+├── store/
+│   └── authStore.ts   # État global Zustand
+├── middleware/
+│   ├── authMiddleware.tsx  # ProtectedRoute, PublicRoute
+│   └── roleMiddleware.tsx  # RoleProtectedRoute
+└── types/
+    ├── api.ts         # Types API
+    └── auth.ts        # Types Auth
 ```
 
-**Edit a file directly in GitHub**
+## 🚀 Démarrage
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+# Installation des dépendances
+npm install
 
-**Use GitHub Codespaces**
+# Démarrage du serveur de développement
+npm run dev
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Tests
+npm test
+```
 
-## What technologies are used for this project?
+## 🔑 Connexion (Mode Démo)
 
-This project is built with:
+**Email** : n'importe quelle adresse (ex: `test@test.com`)  
+**Mot de passe** : n'importe quel mot de passe (ex: `password`)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+L'application fonctionne en mode démo sans backend actif.
 
-## How can I deploy this project?
+## 🛠️ Technologies
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+- **React 18** + **TypeScript**
+- **Vite** - Build tool
+- **Zustand** - State management
+- **Dexie.js** - IndexedDB wrapper (offline-first)
+- **Axios** - HTTP client
+- **React Router** - Routing
+- **i18next** - Internationalisation
+- **Zod** - Validation
+- **Tailwind CSS** - Styling
+- **Vitest** - Testing
 
-## Can I connect a custom domain to my Lovable project?
+## 📝 Notes de Développement
 
-Yes, you can!
+- **Mode Démo** : L'authentification utilise un fallback mock si le backend n'est pas disponible
+- **Offline-First** : Les données sont stockées localement avec Dexie et synchronisées quand le backend est disponible
+- **PWA** : L'application peut être installée sur mobile/desktop
+- **Tests** : Configuration Vitest avec tests basiques pour les composants
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📦 Déploiement
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Le code est synchronisé avec le dépôt GitHub :
+`https://github.com/mildadiagorossi-arch/smart-school-companion.git`
+
+---
+
+**Développé avec ❤️ par l'équipe Smart School**
